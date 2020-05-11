@@ -156,7 +156,8 @@ def filter_tbl(tbl, min):
     BANNED_WORDS = [
         'THE', 'FUCK', 'ING', 'CEO', 'USD', 'WSB', 'FDA', 'NEWS', 'FOR', 'YOU',
         'BUY', 'HIGH', 'ADS', 'FOMO', 'THIS', 'OTC', 'ELI', 'IMO',
-        'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', "SSR", 'HOLD','TLDR', 'ETF', 'COVI', 'ORR'
+        'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', "SSR", 'HOLD','TLDR', 'ETF', 'COVI', 'ORR', 'CLIC','HERE','CHAR','ESTI','MATE','EARN',
+        'INGS','TIME','USA'
     ]
     tbl = [row for row in tbl if row[1] > min]
     tbl = [row for row in tbl if row[0] not in BANNED_WORDS]
