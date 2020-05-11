@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ AutoDD: Automatically does the so called Due Diligence for you. """
-#Contains code from:
+
 #AutoDD - Automatically does the "due diligence" for you.
 #Copyright (C) 2020  Fufu Fang
 
@@ -51,7 +51,7 @@ def d():
     global sub
     sub="helloprofits"
 def e():
-    print("custom sub\n")	
+    print("custom sub\n")
     global sub
     sub = input("Insert sub to analyze:\n ")
 
@@ -156,7 +156,7 @@ def filter_tbl(tbl, min):
     BANNED_WORDS = [
         'THE', 'FUCK', 'ING', 'CEO', 'USD', 'WSB', 'FDA', 'NEWS', 'FOR', 'YOU',
         'BUY', 'HIGH', 'ADS', 'FOMO', 'THIS', 'OTC', 'ELI', 'IMO',
-        'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', "SSR", 'HOLD','TLDR'
+        'CBS', 'SEC', 'NOW', 'OVER', 'ROPE', 'MOON', "SSR", 'HOLD','TLDR', 'ETF', 'COVI', 'ORR'
     ]
     tbl = [row for row in tbl if row[1] > min]
     tbl = [row for row in tbl if row[0] not in BANNED_WORDS]
@@ -166,13 +166,16 @@ def filter_tbl(tbl, min):
 
 
 def print_tbl(tbl):
-	sent = vol = price = volchange = trend = perc = "--"
-	print("Code\tFrequency\tWatchers\tPrice\tSentiment\tTrendScore\tVolume\tVol%\tPrice%")
+	sent = vol = price = volchange = trend = perc = indic = value = "--"
+	
+	print(f"Code\tFreq\tWatch\tPrice\tPrice%\tSent\tTrend\tVolume\t\tVol%\tValue\t\tDirection")
 	for row in tbl:
 		r = requests.get(url='https://api.stocktwits.com/api/2/streams/symbol/'+row[0]+'.json')
 		json_data = json.loads(r.text)
 		try:
 			watchers = json_data['symbol']['watchlist_count']
+			watchers=f"{watchers:<7}"
+			watchers=f"{watchers:<7}"
 		except KeyError:
 			watchers="--"
 			
@@ -195,15 +198,17 @@ def print_tbl(tbl):
 		try:
 			sent=jsData.group(1)
 		except AttributeError:
-			sent:"--"
+			sent="--"
 		try:
 			trend = round(float(trend.group(1)),3)
 		except AttributeError:
-			trend:"--"
+			trend="--"
 		try:
 			vol=volume.group(1)
+			vol=f"{vol:<8}"
 		except AttributeError:
-			vol:"--"
+			vol="--"
+			vol=f"{vol:<8}"
 		try:
 			volchange=volchange.group(1)
 		except AttributeError:
@@ -211,13 +216,39 @@ def print_tbl(tbl):
 		try:
 			perc=perc.group(1)
 		except AttributeError:
-			perc:"--"
+			perc="--"
 			
 			
 		try:
 			price = doc.xpath('//*[@id="app"]/div/div/div[3]/div[2]/div/div[1]/div[1]/div/div[1]/div/div/div[1]/div[2]/span[1]/text()')[2]     
 		except IndexError:
 			price="--"  
+		
+		user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+		headers = {'User-Agent': user_agent}
+
+		yho = requests.get(url='https://finance.yahoo.com/quote/'+row[0]+'', headers=headers)
+		page_source = yho.content	
+
+		soup = BeautifulSoup(page_source, "html.parser")
+		#all_scripts = soup.find_all('script')
+		script=str(soup)
+
+		jsData = re.search(r'"shortTermOutlook":{"stateDescription":"(.*?)","direction":', script)
+		value=re.search(r'primaryColor\"\sdata-reactid=\"\d*\">(.*?)<\/div>',script)
+
+		try:
+			indic=jsData.group(1)
+		except AttributeError:
+			indic="--"
+		try:
+			value=value.group(1)
+			value=f"{value:<14}"
+		except AttributeError:
+			value="--"
+			value=f"{value:<14}"
+
+		
 
 
 			 
@@ -225,9 +256,10 @@ def print_tbl(tbl):
 
 
 		if len(row[0]) < 4:
-		    padding = ' '
+			padding = ' '
+		
 
-		print(str(row[0]) + padding + "\t" + str(row[1]) + padding + "\t \t" + str(watchers)+ padding + "\t \t" + str(price) + "\t" + str(sent)+ "\t\t"  + str(trend)+ "\t\t"  + str(vol) + "\t" + str(volchange) + "\t" + str(perc))
+		print(str(row[0]) + padding + "\t" + str(row[1]) + "\t" + str(watchers)+ "\t" + str(price) + "\t" + str(perc)+ "\t"+ str(sent)+ "\t" + str(trend)+ "\t"  + str(vol) + "\t" + str(volchange) + "\t" + str(value)+ "\t"+ str(indic))
 
 
 if __name__ == '__main__':
