@@ -9,12 +9,16 @@ import json
 
 stock = input("Choose stock symbol:\n ")
 
-sent = vol = price = volchange = trend = perc = "--"
-print("Code\tEarnings\tWatchers\tPrice\tSentiment\tTrendScore\tVolume\tVol%\tPrice%\tDirection")
+sent = vol = price = volchange = trend = perc = indic = value = "--"
+	
+print(f"Code\tWatch\tPrice\tPrice%\tSent\tTrend\tVolume\t\tVol%\tValue\t\tDirection")
+
 r = requests.get(url='https://api.stocktwits.com/api/2/streams/symbol/'+stock+'.json')
 json_data = json.loads(r.text)
 try:
 	watchers = json_data['symbol']['watchlist_count']
+	watchers=f"{watchers:<7}"
+	watchers=f"{watchers:<7}"
 except KeyError:
 	watchers="--"
 	
@@ -37,15 +41,17 @@ perc =re.search(r'"percent":(.*),"lastUpdated":"', script)
 try:
 	sent=jsData.group(1)
 except AttributeError:
-	sent:"--"
+	sent="--"
 try:
 	trend = round(float(trend.group(1)),3)
 except AttributeError:
-	trend:"--"
+	trend="--"
 try:
 	vol=volume.group(1)
+	vol=f"{vol:<8}"
 except AttributeError:
-	vol:"--"
+	vol="--"
+	vol=f"{vol:<8}"
 try:
 	volchange=volchange.group(1)
 except AttributeError:
@@ -53,7 +59,7 @@ except AttributeError:
 try:
 	perc=perc.group(1)
 except AttributeError:
-	perc:"--"
+	perc="--"
 	
 	
 try:
@@ -70,26 +76,30 @@ page_source = yho.content
 soup = BeautifulSoup(page_source, "html.parser")
 #all_scripts = soup.find_all('script')
 script=str(soup)
-earn = re.search(r'<span data-reactid="159">(.*?)<\/span>', script)
+
 jsData = re.search(r'"shortTermOutlook":{"stateDescription":"(.*?)","direction":', script)
-
-
-
+value=re.search(r'primaryColor\"\sdata-reactid=\"\d*\">(.*?)<\/div>',script)
 
 try:
 	indic=jsData.group(1)
 except AttributeError:
-	indic:"--"
+	indic="--"
 try:
-	earn=earn.group(1)
+	value=value.group(1)
+	value=f"{value:<14}"
 except AttributeError:
-	earn:"--"
+	value="--"
+	value=f"{value:<14}"
+
+
+
 
 	 
 padding = ""
 
 
 if len(stock) < 4:
-    padding = ' '
+	padding = ' '
 
-print(str(stock) + padding + "\t" + str(earn) + padding + "\t" + str(watchers)+ padding + "\t \t" + str(price) + "\t" + str(sent)+ "\t\t"  + str(trend)+ "\t\t"  + str(vol) + "\t" + str(volchange) + "\t" + str(perc)+ "\t"+ str(indic))
+
+print(str(stock) + padding + "\t"  + str(watchers)+ "\t" + str(price) + "\t" + str(perc)+ "\t"+ str(sent)+ "\t" + str(trend)+ "\t"  + str(vol) + "\t" + str(volchange) + "\t" + str(value)+ "\t"+ str(indic))
