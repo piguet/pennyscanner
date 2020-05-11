@@ -51,6 +51,7 @@ def d():
     global sub
     sub="helloprofits"
 def e():
+    print("custom sub\n")	
     global sub
     sub = input("Insert sub to analyze:\n ")
 
