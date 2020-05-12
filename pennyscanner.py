@@ -201,7 +201,7 @@ def print_tbl(tbl):
 		except AttributeError:
 			sent="--"
 		try:
-			trend = round(float(trend.group(1)),3)
+			trend = round(float(trend.group(1)),2)
 		except AttributeError:
 			trend="--"
 		try:
@@ -215,7 +215,7 @@ def print_tbl(tbl):
 		except AttributeError:
 			volchange:"--"
 		try:
-			perc=perc.group(1)
+			perc=round(float(perc.group(1)),2)
 		except AttributeError:
 			perc="--"
 			
