@@ -57,7 +57,7 @@ try:
 except AttributeError:
 	volchange:"--"
 try:
-	perc=perc.group(1)
+	perc=round(float(perc.group(1)),2)
 except AttributeError:
 	perc="--"
 	
